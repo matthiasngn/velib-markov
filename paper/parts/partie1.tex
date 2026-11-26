@@ -1,0 +1,327 @@
+\documentclass[10pt,a4paper,twocolumn]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amsthm,mathtools}
+\usepackage{stix2}
+\usepackage[scaled=0.95]{zi4}
+\usepackage[a4paper,left=1.8cm,right=1.8cm,top=2.3cm,bottom=2.2cm,columnsep=0.6cm,headsep=0.45cm]{geometry}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[font=small,labelfont=sc,labelsep=period]{caption}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\frenchsetup{StandardItemLabels=true}
+\setlist{nosep,leftmargin=1.3em}
+\addto\captionsfrench{%
+  \renewcommand{\proofname}{Preuve}%
+  \renewcommand{\figurename}{Fig.}%
+  \renewcommand{\tablename}{Tab.}}
+
+% ---------- en-tête et pied de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\small\itshape Modèle markovien d'une station Vélib'}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---------- titres
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.6em}{}
+\titlespacing*{\section}{0pt}{9pt plus 2pt minus 2pt}{4pt plus 1pt}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\subsection}{0pt}{6pt plus 2pt minus 1pt}{3pt plus 1pt}
+\titleformat{\paragraph}[runin]{\normalfont\normalsize\bfseries}{}{0pt}{}[.]
+\titlespacing*{\paragraph}{0pt}{3pt plus 1pt}{0.5em}
+
+% ---------- énoncés
+\newtheoremstyle{enonce}{3pt plus 1pt}{3pt plus 1pt}{\itshape}{}{\bfseries}{.}{0.4em}%
+  {\thmname{#1}\thmnumber{ #2}\thmnote{ (\mdseries #3)}}
+\newtheoremstyle{defi}{3pt plus 1pt}{3pt plus 1pt}{\normalfont}{}{\bfseries}{.}{0.4em}%
+  {\thmname{#1}\thmnumber{ #2}\thmnote{ (\mdseries #3)}}
+\theoremstyle{enonce}
+\newtheorem{theoreme}{Théorème}[section]
+\newtheorem{proposition}[theoreme]{Proposition}
+\newtheorem{lemme}[theoreme]{Lemme}
+\newtheorem{corollaire}[theoreme]{Corollaire}
+\theoremstyle{defi}
+\newtheorem{definition}[theoreme]{Définition}
+\newtheorem{remarque}[theoreme]{Remarque}
+
+% ---------- code
+\definecolor{vertTIPE}{RGB}{24,110,83}
+\definecolor{grisCode}{RGB}{105,110,120}
+\lstdefinestyle{py}{language=Python, basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{vertTIPE}\bfseries, commentstyle=\color{grisCode}\itshape,
+  stringstyle=\color{grisCode}, showstringspaces=false, columns=fullflexible,
+  keepspaces=true, frame=lines, framerule=0.3pt, rulecolor=\color{grisCode},
+  aboveskip=3pt, belowskip=1pt, breaklines=true}
+
+% ---------- notations
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\VT}{\mathrm{VT}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\un}{\mathbf{1}}
+\newcommand{\hr}{\,\mathrm{h}^{-1}}
+\newcommand{\trel}{t_{\mathrm{rel}}}
+\newcommand{\tmel}{t_{\mathrm{m\acute el}}}
+\newcommand{\Nu}{N^{\uparrow}}
+\newcommand{\Nd}{N^{\downarrow}}
+\newcommand{\Tu}{T^{\uparrow}}
+\newcommand{\Td}{T^{\downarrow}}
+
+\begin{document}
+
+\twocolumn[{%
+\begin{center}
+{\LARGE\bfseries Modèle markovien d'une station Vélib'~:\\[3pt]
+régime stationnaire, calibration et limites\par}
+\vspace{9pt}
+{\large Matthias Nguyen\par}
+\vspace{3pt}
+{\small Lycée Sainte-Geneviève, Versailles\par}
+% {\small\ttfamily adresse électronique\par}
+\vspace{2pt}
+{\small Novembre 2026\par}
+\end{center}
+\vspace{2pt}
+\begin{center}
+\begin{minipage}{0.9\textwidth}
+\begin{center}\textbf{Abstract}\end{center}
+\vspace{-5pt}
+\small\selectlanguage{english}
+We model the number of bikes at a bike-sharing station as a continuous-time birth--death chain on $\{0,\dots,C\}$, that is, an M/M/1/C queue. We give a self-contained treatment of the tools involved: existence, uniqueness and geometric convergence of the stationary law through a Doeblin contraction argument, the full spectrum of the generator with two-sided bounds on the distance to equilibrium, and closed-form hitting times. Rates are estimated by maximum likelihood from minute-by-minute records of Paris stations (May--June 2026). Likelihood-ratio tests reject constant rates within a day ($p<10^{@@pexp@@}$). With rates constant on two-hour slots, out-of-sample 90\,\% prediction bands cover @@couv2h_en@@\,\% of observed minutes at a two-hour horizon. The stationary law is never observed: mixing times (@@melmin_ent@@ to @@melmax_ent@@ hours) exceed the time scale on which rates change. The relevant object is the periodic regime of the inhomogeneous chain, which forgets its initial state by a factor @@vp2_en@@ per day. We also show that two numerical shortcuts of a preliminary study lowered its midday forecast by @@biais12@@ bikes. The same framework underlies queue-based models of limit order books and generator estimation in credit risk.
+
+\smallskip
+\noindent\textit{Keywords:} continuous-time Markov chains, birth--death processes, spectral gap, maximum likelihood, backtesting, bike sharing, limit order books.
+\selectlanguage{french}
+\end{minipage}
+\end{center}
+\vspace{10pt}
+}]
+{\renewcommand{\thefootnote}{}\footnotetext{Ce texte reprend et prolonge la partie personnelle d'un TIPE de mathématiques préparé en classe de MP* (session 2026), désigné ci-dessous par \og le TIPE\fg{}.}}
+
+\section{Introduction}\label{sec:intro}
+
+Une station Vélib' de $C$ bornes alterne des phases où elle se vide et des phases où elle se remplit. Vide, elle refuse les retraits~; pleine, elle refuse les dépôts. L'opérateur corrige ces déséquilibres par camions. Prévoir l'occupation d'une station à quelques heures conditionne donc les tournées de régulation et le dimensionnement des stations.
+
+Le modèle le plus simple décrit le nombre de vélos $X_t$ comme une chaîne de Markov à temps continu de naissance et de mort, bornée par $0$ et $C$~: c'est la file M/M/1/C \cite{STGH18}. Raviv et Kolka \cite{RK13} l'utilisent avec des taux dépendant du temps pour définir une fonction d'insatisfaction des usagers. Schuijbroek, Hampshire et van Hoeve \cite{SHH17} en déduisent des niveaux de service qui contraignent la planification de la régulation. Fricker et Gast \cite{FG16} étudient la limite de champ moyen d'un réseau homogène de telles stations.
+
+La même structure apparaît en microstructure des marchés. La file d'ordres à un niveau de prix est un processus de naissance et de mort, alimenté par les ordres limites et vidé par les ordres au marché et les annulations \cite{CST10,CdL13,HLR15}. L'estimation d'un générateur à partir de trajectoires observées en continu est aussi celle des matrices de migration de notations en risque de crédit \cite{JLT97,LS02}. La section~\ref{sec:discussion} revient sur ces analogies.
+
+\paragraph{Contributions} (i) Un exposé autonome des outils~: convergence vers la loi stationnaire par contraction de Doeblin, spectre explicite du générateur, bornes de convergence et temps d'atteinte. (ii) Une estimation par maximum de vraisemblance avec temps d'exposition, intervalles de confiance et tests du rapport de vraisemblance. (iii) Une validation hors échantillon à 2~h et à 24~h sur des relevés minute par minute de deux stations parisiennes. (iv) Une explication quantitative de l'échec de la loi stationnaire~: les temps de mélange dépassent l'échelle de variation des taux, et l'objet pertinent est le régime périodique de la chaîne inhomogène. (v) La correction de deux biais numériques de l'étude préliminaire.
+
+La section~\ref{sec:outils} rassemble les outils probabilistes, la section~\ref{sec:modele} étudie le modèle à taux constants, les sections~\ref{sec:estimation} et~\ref{sec:simulation} traitent l'estimation et la simulation. La section~\ref{sec:resultats} confronte le modèle aux données et la section~\ref{sec:discussion} discute ses limites. Le code figure en annexe~\ref{sec:code}.
+
+\section{Outils probabilistes}\label{sec:outils}
+
+Cette section fixe le cadre. Les résultats de théorie de la mesure utilisés (unicité des mesures, Fubini--Tonelli, changement de variable) sont admis \cite{JP04}.
+
+\subsection{Variables aléatoires et lois}
+
+\begin{definition}
+Une \emph{tribu} sur un ensemble $\Omega$ est une partie $\mathcal{F}\subset\mathcal{P}(\Omega)$ qui contient $\Omega$ et qui est stable par passage au complémentaire et par union dénombrable. Une \emph{probabilité} sur $(\Omega,\mathcal{F})$ est une application $\PP:\mathcal{F}\to[0,1]$ telle que $\PP(\Omega)=1$ et $\PP\big(\bigcup_{n\geq1}A_n\big)=\sum_{n\geq1}\PP(A_n)$ pour toute suite $(A_n)_{n\geq1}$ d'éléments de $\mathcal{F}$ deux à deux disjoints. Le triplet $(\Omega,\mathcal{F},\PP)$ est un \emph{espace probabilisé}~; les éléments de $\mathcal{F}$ sont les \emph{événements}.
+\end{definition}
+
+\begin{definition}
+Soient $(E,\mathcal{E})$ et $(E',\mathcal{E}')$ deux espaces mesurables. Une application $f:E\to E'$ est \emph{mesurable} si $f^{-1}(B)\in\mathcal{E}$ pour tout $B\in\mathcal{E}'$. Une \emph{variable aléatoire} à valeurs dans $(E',\mathcal{E}')$ est une application mesurable $X:(\Omega,\mathcal{F})\to(E',\mathcal{E}')$. Sa \emph{loi} est la mesure image $\PP_X$ définie par $\PP_X(B)=\PP(X^{-1}(B))=\PP(X\in B)$ pour $B\in\mathcal{E}'$.
+\end{definition}
+
+On munit $\mathbb{R}$ de la tribu borélienne $\mathcal{B}(\mathbb{R})$, engendrée par les intervalles $]-\infty,t]$, et un ensemble fini $E$ de la tribu $\mathcal{P}(E)$. Comme $\{B:X^{-1}(B)\in\mathcal{F}\}$ est une tribu, une application $X:\Omega\to\mathbb{R}$ est une variable aléatoire dès que $\{X\leq t\}\in\mathcal{F}$ pour tout réel $t$. Sommes, produits, limites simples de variables aléatoires réelles et composées par des fonctions boréliennes sont des variables aléatoires. La loi d'une variable à valeurs dans $E$ fini est le vecteur $\big(\PP(X=i)\big)_{i\in E}$.
+
+\begin{definition}
+La \emph{fonction de répartition} d'une variable aléatoire réelle $X$ est $F_X(t)=\PP(X\leq t)$, $t\in\mathbb{R}$. Une fonction borélienne $f\geq0$ telle que $\int_{\mathbb{R}}f(x)\,\dd x=1$ est une \emph{densité} de $X$ si $\PP(X\in B)=\int_Bf(x)\,\dd x$ pour tout $B\in\mathcal{B}(\mathbb{R})$.
+\end{definition}
+
+Par continuité monotone de $\PP$, $F_X$ est croissante et continue à droite. Elle caractérise la loi~: deux probabilités qui coïncident sur les intervalles $]-\infty,t]$, famille stable par intersection finie qui engendre $\mathcal{B}(\mathbb{R})$, coïncident sur $\mathcal{B}(\mathbb{R})$ (lemme de classe monotone). L'espérance d'une variable aléatoire $X$ positive ou intégrable est $\EE[X]=\int_\Omega X\,\dd\PP$. Si $X$ a pour densité $f$ et si $g$ est borélienne positive, ou telle que $g(X)$ soit intégrable, alors $\EE[g(X)]=\int_{\mathbb{R}}g(x)f(x)\,\dd x$ (théorème de transfert).
+
+\begin{definition}
+Des sous-tribus $\mathcal{G}_1,\dots,\mathcal{G}_m$ de $\mathcal{F}$ sont \emph{indépendantes} si $\PP(A_1\cap\dots\cap A_m)=\prod_{k=1}^m\PP(A_k)$ pour tous $A_1\in\mathcal{G}_1,\dots,A_m\in\mathcal{G}_m$. Des variables aléatoires $X_1,\dots,X_m$, à valeurs dans des espaces $(E_k,\mathcal{E}_k)$, sont indépendantes si les tribus $\sigma(X_k)=\{X_k^{-1}(B):B\in\mathcal{E}_k\}$ le sont~; une suite de variables est indépendante si toute sous-famille finie l'est.
+\end{definition}
+
+Des variables réelles $X_1,\dots,X_m$ de densités $f_1,\dots,f_m$ sont indépendantes si et seulement si le vecteur $(X_1,\dots,X_m)$ a pour densité $(x_1,\dots,x_m)\mapsto\prod_{k=1}^mf_k(x_k)$ sur $\mathbb{R}^m$. Les probabilités qui le concernent se calculent alors par le théorème de Fubini--Tonelli. En particulier, si $X$ et $Y$ sont indépendantes de densités $f$ et $g$, alors pour $B\in\mathcal{B}(\mathbb{R})$, avec le changement de variable $z=x+y$,
+\begin{align*}
+\PP(X+Y\in B)&=\int_{\mathbb{R}^2}\un_B(x+y)f(x)g(y)\,\dd x\,\dd y\\
+&=\int_B(f*g)(z)\,\dd z,
+\end{align*}
+où $(f*g)(z)=\int_{\mathbb{R}}f(x)g(z-x)\,\dd x$~: la somme $X+Y$ a pour densité $f*g$. Enfin, des fonctions mesurables de paquets disjoints de variables indépendantes sont indépendantes (regroupement par paquets).
+
+\subsection{Loi exponentielle}
+
+\begin{definition}
+Une variable aléatoire réelle $T$ suit la loi exponentielle $\mathcal{E}(a)$, $a>0$, si elle a pour densité $x\mapsto ae^{-ax}\un_{\{x\geq0\}}$. Alors $\PP(T>t)=e^{-at}$ pour $t\geq0$, $\EE[T]=1/a$ et $\mathrm{Var}(T)=1/a^2$.
+\end{definition}
+
+\begin{proposition}[absence de mémoire]\label{prop:memoire}
+Soit $T$ une variable aléatoire réelle telle que $\PP(T>0)=1$. Les assertions suivantes sont équivalentes~:
+\begin{enumerate}[label=(\roman*)]
+\item $\PP(T>s+t)=\PP(T>s)\,\PP(T>t)$ pour tous $s,t\geq0$~;
+\item $T$ suit une loi exponentielle.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(ii)~$\Rightarrow$~(i) est immédiat. Réciproquement, posons $G(t)=\PP(T>t)=1-F_T(t)$. Par continuité monotone de $\PP$, $G$ est décroissante, continue à droite, $G(0)=1$ et $G(t)\to0$ quand $t\to+\infty$. Si $G(1)=0$, alors $G(1/n)^n=G(1)=0$, donc $G(1/n)=0$ pour tout $n\geq1$, ce qui contredit $G(1/n)\to G(0)=1$. Si $G(1)=1$, alors $G(n)=G(1)^n=1$ pour tout $n$, ce qui contredit $G\to0$. Donc $G(1)=e^{-a}$ avec $a>0$. L'équation fonctionnelle donne $G(1/q)=e^{-a/q}$, puis $G(p/q)=e^{-ap/q}$ pour $p,q\in\mathbb{N}^*$, et la décroissance de $G$ étend l'égalité à tout réel $t\geq0$. Comme $F_T(t)=0$ pour $t<0$, $F_T$ est la fonction de répartition de $\mathcal{E}(a)$, qui caractérise la loi.
+\end{proof}
+
+\begin{lemme}[horloges en compétition]\label{lem:horloges}
+Soient $A_1,\dots,A_m$ des variables aléatoires indépendantes, $A_i\sim\mathcal{E}(a_i)$, et $a=\sum_{i=1}^ma_i$. Presque sûrement, le minimum $M=\min_iA_i$ est atteint en un unique indice $I$. On a $M\sim\mathcal{E}(a)$, $\PP(I=i)=a_i/a$, et $M$ et $I$ sont indépendants.
+\end{lemme}
+
+\begin{proof}
+Pour $i\neq j$, le couple $(A_i,A_j)$ a une densité sur $\mathbb{R}^2$ et la diagonale est de mesure de Lebesgue nulle, donc $\PP(A_i=A_j)=0$. L'indice $I$ est ainsi défini presque sûrement, et $\{I=i\}=\bigcap_{j\neq i}\{A_j>A_i\}$ est un événement. Le vecteur $(A_1,\dots,A_m)$ a pour densité le produit des densités~; pour $t\geq0$, le théorème de Fubini--Tonelli donne
+\begin{align*}
+\PP(M>t,\,I=i)&=\int_t^{+\infty}a_ie^{-a_is}\prod_{j\neq i}\PP(A_j>s)\,\dd s\\
+&=\frac{a_i}{a}\,e^{-at}.
+\end{align*}
+La somme sur $i$ donne $\PP(M>t)=e^{-at}$, le cas $t=0$ donne $\PP(I=i)=a_i/a$. La factorisation $\PP(M>t,I=i)=\PP(M>t)\PP(I=i)$ s'étend à $\sigma(M)$ par classe monotone~: $M$ et $I$ sont indépendants.
+\end{proof}
+
+\subsection{Processus de Poisson}
+
+\begin{definition}
+Soient $(\tau_k)_{k\geq1}$ des variables aléatoires indépendantes de loi $\mathcal{E}(\lambda)$, $S_0=0$ et $S_n=\sum_{k=1}^n\tau_k$. Le \emph{processus de Poisson} d'intensité $\lambda$ est la famille $(N_t)_{t\geq0}$ définie par $N_t=\sum_{n\geq1}\un_{\{S_n\leq t\}}$.
+\end{definition}
+
+Chaque $N_t$ est une variable aléatoire à valeurs dans $\mathbb{N}\cup\{+\infty\}$, limite croissante de variables aléatoires. Elle est finie presque sûrement~: par indépendance, $\EE[e^{-S_n}]=\big(\lambda/(1+\lambda)\big)^n$, et par convergence dominée $\EE\big[\lim_ne^{-S_n}\big]=0$, donc $S_n\to+\infty$ presque sûrement.
+
+\begin{proposition}\label{prop:poisson}
+$S_n$ a pour densité $f_n(s)=\lambda^ns^{n-1}e^{-\lambda s}\un_{\{s>0\}}/(n-1)!$, et pour tout $t>0$, $N_t$ suit la loi de Poisson de paramètre $\lambda t$.
+\end{proposition}
+
+\begin{proof}
+Par regroupement par paquets, $S_n$ est indépendante de $\tau_{n+1}$. Si $S_n$ a pour densité $f_n$, la variable $S_{n+1}=S_n+\tau_{n+1}$ a donc pour densité
+\[
+(f_n*f_1)(s)=\int_0^s\frac{\lambda^nx^{n-1}e^{-\lambda x}}{(n-1)!}\,\lambda e^{-\lambda(s-x)}\,\dd x=f_{n+1}(s)
+\]
+pour $s>0$, d'où la première assertion par récurrence. On vérifie que $\frac{\dd}{\dd t}\big(e^{-\lambda t}(\lambda t)^n/n!\big)=f_n(t)-f_{n+1}(t)$ pour $n\geq1$. Comme $(S_n)$ est croissante, $\{N_t\geq n\}=\{S_n\leq t\}$, et
+\[
+\PP(N_t=n)=\PP(S_n\leq t)-\PP(S_{n+1}\leq t)=e^{-\lambda t}\frac{(\lambda t)^n}{n!},
+\]
+avec $\PP(N_t=0)=\PP(\tau_1>t)=e^{-\lambda t}$.
+\end{proof}
+
+Le processus $(N_t)$ est de plus à accroissements indépendants et stationnaires \cite[§2.4]{Nor97}.
+
+\begin{remarque}\label{rem:palm}
+La superposition d'un grand nombre de flux indépendants, chacun de faible intensité, est approximativement poissonnienne (théorème de Palm--Khintchine \cite{DVJ03}). C'est la justification usuelle de l'hypothèse poissonnienne pour les usagers d'une station. La section~\ref{sec:poisson} en teste les limites.
+\end{remarque}
+
+\subsection{Chaînes de Markov à temps continu}
+
+Soit $E$ un ensemble fini, muni de la tribu $\mathcal{P}(E)$. Un \emph{processus} à valeurs dans $E$ est une famille $(X_t)_{t\geq0}$ de variables aléatoires à valeurs dans $E$. Une matrice $Q=(q_{ij})_{i,j\in E}$ est un \emph{générateur} si $q_{ij}\geq0$ pour $i\neq j$ et $\sum_{j\in E}q_{ij}=0$ pour tout $i$. On note $q_i=-q_{ii}=\sum_{j\neq i}q_{ij}$ et $\bar q=\max_iq_i$.
+
+\begin{definition}
+Soit $(P(t))_{t\geq0}$ une famille de matrices stochastiques. Un processus $(X_t)_{t\geq0}$ est une \emph{chaîne de Markov homogène} de semi-groupe $(P(t))$ si pour tous $0\leq t_0<\dots<t_n<t$ et $i_0,\dots,i_n,j\in E$ tels que $\PP(X_{t_0}=i_0,\dots,X_{t_n}=i_n)>0$,
+\[
+\PP(X_t=j\mid X_{t_0}=i_0,\dots,X_{t_n}=i_n)=P(t-t_n)_{i_nj}.
+\]
+On note $\PP_i$ la probabilité conditionnelle sachant $X_0=i$ et $\EE_i$ l'espérance associée.
+\end{definition}
+
+Comme $E$ est fini, conditionner par des événements de probabilité positive suffit.
+
+\paragraph{Construction par sauts} Soient $(Y_n)_{n\geq0}$ une chaîne de Markov à temps discret sur $E$, de matrice de transition $\Pi$ donnée par $\Pi_{ij}=q_{ij}/q_i$ pour $j\neq i$ (et $\Pi_{ii}=1$ si $q_i=0$), et $(\varepsilon_n)_{n\geq1}$ des variables indépendantes de loi $\mathcal{E}(1)$, indépendantes de $(Y_n)$. On pose $J_0=0$, $J_{n+1}=J_n+\varepsilon_{n+1}/q_{Y_n}$ (avec $J_{n+1}=+\infty$ si $q_{Y_n}=0$), et $X_t=Y_n$ pour $J_n\leq t<J_{n+1}$. Sachant $Y_n=i$, la durée de séjour $J_{n+1}-J_n$ suit la loi $\mathcal{E}(q_i)$. Comme $J_n\geq(\varepsilon_1+\dots+\varepsilon_n)/\bar q$, $J_n\to+\infty$ presque sûrement, comme pour le processus de Poisson, et $X_t$ est défini pour tout $t$. D'après le lemme~\ref{lem:horloges}, on obtient la même loi en lançant dans l'état $i$ des horloges indépendantes de lois $\mathcal{E}(q_{ij})$, $j\neq i$~: la première qui sonne fixe l'instant et la destination du saut. C'est l'algorithme de simulation de la section~\ref{sec:simulation}.
+
+\begin{proposition}[semi-groupe]\label{prop:semigroupe}
+Le processus ainsi construit est une chaîne de Markov homogène de semi-groupe $P(t)=e^{tQ}=\sum_{k\geq0}t^kQ^k/k!$. Ce semi-groupe vérifie $P(s+t)=P(s)P(t)$ (Chapman--Kolmogorov) et $P'(t)=QP(t)=P(t)Q$ (équations de Kolmogorov). La loi $p(t)$ de $X_t$, vue comme vecteur ligne, vérifie $p(t)=p(0)\,e^{tQ}$.
+\end{proposition}
+
+Ce résultat est admis \cite[§2.6--2.8]{Nor97}, \cite{Guy07}~; la propriété de Markov y découle de l'absence de mémoire des durées de séjour. La représentation suivante de $e^{tQ}$ servira plusieurs fois.
+
+\begin{lemme}[uniformisation]\label{lem:unif}
+Soient $\Lambda>\max_iq_i$ et $K=I+Q/\Lambda$. La matrice $K$ est stochastique, de diagonale strictement positive, et
+\begin{equation}\label{eq:unif}
+e^{tQ}=\sum_{k\geq0}e^{-\Lambda t}\frac{(\Lambda t)^k}{k!}\,K^k.
+\end{equation}
+\end{lemme}
+
+\begin{proof}
+$K_{ij}=q_{ij}/\Lambda\geq0$ pour $i\neq j$, $K_{ii}=1-q_i/\Lambda>0$, et les lignes de $K$ somment à $1$. Comme $tQ=\Lambda t(K-I)$ et que $I$ et $K$ commutent, $e^{tQ}=e^{-\Lambda t}e^{\Lambda tK}$.
+\end{proof}
+
+La formule~\eqref{eq:unif} décrit une horloge de Poisson d'intensité $\Lambda$~; à chaque sonnerie, la chaîne saute selon $K$, éventuellement sur place.
+
+\begin{definition}
+$Q$ est \emph{irréductible} si pour tous $i\neq j$ il existe des états $i=i_0,i_1,\dots,i_r=j$ tels que $q_{i_{\ell-1}i_\ell}>0$ pour $1\leq\ell\leq r$.
+\end{definition}
+
+\begin{lemme}\label{lem:positif}
+Si $Q$ est irréductible, $P(t)_{ij}>0$ pour tous $i,j\in E$ et $t>0$.
+\end{lemme}
+
+\begin{proof}
+Avec un chemin de $i$ à $j$ comme ci-dessus, $(K^r)_{ij}\geq K_{i_0i_1}\cdots K_{i_{r-1}i_r}>0$, et $(K^0)_{ii}=1$. Le terme d'indice $r$ de~\eqref{eq:unif} est donc strictement positif.
+\end{proof}
+
+\subsection{Loi stationnaire et convergence}
+
+\begin{definition}
+Une loi $\pi$ sur $E$ est \emph{stationnaire} si $\pi Q=0$, c'est-à-dire si $\pi P(t)=\pi$ pour tout $t\geq0$. La distance en variation totale entre deux lois est
+\[
+\|\mu-\nu\|_\VT=\frac12\sum_{j\in E}|\mu_j-\nu_j|=\max_{A\subset E}|\mu(A)-\nu(A)|.
+\]
+\end{definition}
+
+\begin{lemme}[Doeblin]\label{lem:doeblin}
+Soient $P$ une matrice stochastique et $\delta(P)=\sum_{j\in E}\min_{i\in E}P_{ij}$. Pour toutes lois $\mu$ et $\nu$,
+\[
+\|\mu P-\nu P\|_\VT\leq\big(1-\delta(P)\big)\,\|\mu-\nu\|_\VT.
+\]
+\end{lemme}
+
+\begin{proof}
+Notons $m_j=\min_iP_{ij}$ et $\delta=\delta(P)$. Si $\delta=1$, toutes les lignes de $P$ valent $m$ et $\mu P=\nu P$. Sinon, $R=(P-\un m)/(1-\delta)$ est stochastique, où $\un$ est le vecteur colonne de uns. Comme $(\mu-\nu)\un=0$, on a $\mu P-\nu P=(1-\delta)(\mu-\nu)R$. Enfin, pour tout vecteur ligne $x$, $\sum_j|(xR)_j|\leq\sum_j\sum_i|x_i|R_{ij}=\sum_i|x_i|$.
+\end{proof}
+
+\begin{theoreme}[loi stationnaire]\label{thm:stationnaire}
+Soient $Q$ un générateur irréductible sur $E$ fini et $h>0$. Il existe une unique loi stationnaire $\pi$~; elle charge tous les états. Pour toute loi initiale $\mu$ et tout $t\geq0$,
+\[
+\|\mu e^{tQ}-\pi\|_\VT\leq(1-\delta_h)^{\lfloor t/h\rfloor},\qquad \delta_h=\delta(e^{hQ})>0.
+\]
+\end{theoreme}
+
+\begin{proof}
+D'après le lemme~\ref{lem:positif}, $P(h)$ est à coefficients strictement positifs, donc $\delta_h>0$. L'ensemble $\mathcal{P}$ des lois sur $E$ est un fermé de $\mathbb{R}^E$, donc complet pour $\|\cdot\|_\VT$, et $\mu\mapsto\mu P(h)$ est une contraction de rapport $1-\delta_h$ sur $\mathcal{P}$ (lemme~\ref{lem:doeblin}). Le théorème du point fixe donne une unique loi $\pi$ telle que $\pi P(h)=\pi$. Pour $s\geq0$, $\pi P(s)$ est encore un point fixe, car $\pi P(s)P(h)=\pi P(h)P(s)=\pi P(s)$~; donc $\pi P(s)=\pi$ et $\pi$ est stationnaire. Une loi stationnaire est un point fixe, d'où l'unicité. Comme $\pi=\pi P(h)$ et $P(h)>0$, $\pi_j>0$ pour tout $j$. Enfin, pour $t=nh+r$ avec $0\leq r<h$,
+\[
+\|\mu P(t)-\pi\|_\VT=\|\mu P(r)P(h)^n-\pi P(h)^n\|_\VT\leq(1-\delta_h)^n.\qedhere
+\]
+\end{proof}
+
+Le TIPE admettait ce résultat en invoquant le théorème de Perron--Frobenius. La preuve ci-dessus est autonome, mais la constante $1-\delta_h$ est en général très pessimiste~; la section~\ref{sec:spectre} donne la vitesse exacte pour notre modèle.
+
+\begin{theoreme}[ergodique, admis {\cite[§3.8]{Nor97}}]\label{thm:ergodique}
+Sous les hypothèses du théorème~\ref{thm:stationnaire}, pour toute fonction $f:E\to\mathbb{R}$ et toute loi initiale,
+\[
+\frac1t\int_0^tf(X_s)\,\dd s\xrightarrow[t\to+\infty]{\text{p.s.}}\sum_{j\in E}\pi_jf(j).
+\]
+\end{theoreme}
+
+Avec $f=\un_{\{j\}}$, $\pi_j$ est la fraction du temps passée en $j$ sur le long terme. C'est en ce sens que la section~\ref{sec:nonstationnaire} confronte $\pi$ aux données.
+
+\subsection{Taux constants par morceaux}\label{sec:periodique}
+
+Soient $0=\tau_0<\tau_1<\dots<\tau_K=T$ et des générateurs $Q_1,\dots,Q_K$. La chaîne de générateur $Q_k$ sur $[\tau_{k-1},\tau_k[$ s'obtient en enchaînant les constructions par sauts~: arrivée en $\tau_{k-1}$ dans l'état $i$, elle repart de $i$ avec le générateur $Q_k$. C'est licite par absence de mémoire. La loi de $X_T$ vaut $p(T)=p(0)M$ avec
+\[
+M=e^{h_1Q_1}e^{h_2Q_2}\cdots e^{h_KQ_K},\qquad h_k=\tau_k-\tau_{k-1}.
+\]
+On prolonge les taux par $T$-périodicité, avec $T$ égal à un jour.
+
+\begin{proposition}[régime périodique]\label{prop:periodique}
+Supposons qu'au moins un $Q_k$ soit irréductible. Alors $M$ est à coefficients strictement positifs, $(X_{nT})_{n\geq0}$ est une chaîne de Markov homogène de matrice de transition $M$, et il existe une unique loi $\nu$ telle que $\nu M=\nu$. Pour toute loi initiale $\mu$ et tout $n\geq0$, $\|\mu M^n-\nu\|_\VT\leq(1-\delta(M))^n$. Pour $s\in[\tau_{k-1},\tau_k[$, la loi de $X_{nT+s}$ converge vers
+\[
+\nu_s=\nu\,e^{h_1Q_1}\cdots e^{h_{k-1}Q_{k-1}}e^{(s-\tau_{k-1})Q_k}.
+\]
+\end{proposition}
+
+\begin{proof}
+Chaque facteur $e^{h_kQ_k}$ est stochastique et de diagonale strictement positive, car $(e^{hQ})_{jj}\geq e^{-q_jh}$~; le facteur irréductible est strictement positif (lemme~\ref{lem:positif}). Si $A>0$ et si $B$ est stochastique de diagonale strictement positive, $(AB)_{ij}\geq A_{ij}B_{jj}>0$ et $(BA)_{ij}\geq B_{ii}A_{ij}>0$~; donc $M>0$. La propriété de Markov aux instants $nT$, où les taux recommencent le même cycle, donne la chaîne de matrice $M$. On conclut comme pour le théorème~\ref{thm:stationnaire}~; la convergence de $X_{nT+s}$ s'obtient en appliquant une matrice stochastique, qui contracte $\|\cdot\|_\VT$.
+\end{proof}
+
+La vitesse asymptotique d'oubli de l'état initial est le module $|\lambda_2(M)|$ de la deuxième plus grande valeur propre de $M$~; $1-\delta(M)$ en est une majoration.

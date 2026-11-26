@@ -1,0 +1,214 @@
+
+\section{Modèle de station}\label{sec:modele}
+
+\subsection{Hypothèses}
+
+Soit $X_t\in E=\{0,\dots,C\}$ le nombre de vélos disponibles, mécaniques et électriques, dans une station de $C$ bornes.
+\begin{enumerate}[label=(H\arabic*)]
+\item Les usagers qui veulent déposer un vélo arrivent selon un processus de Poisson d'intensité $\lambda$~; ceux qui veulent en retirer un, selon un processus de Poisson d'intensité $\mu$, indépendant du premier.
+\item Un dépôt dans une station pleine et un retrait dans une station vide sont perdus.
+\item Les taux $\lambda$ et $\mu$ sont constants.
+\end{enumerate}
+L'hypothèse (H3) est relâchée en section~\ref{sec:resultats}, où les taux sont constants par créneaux de 2~h. Sous ces hypothèses, $X$ est la chaîne de générateur
+\[
+Q=\begin{pmatrix}
+-\lambda & \lambda & & & \\
+\mu & -(\lambda+\mu) & \lambda & & \\
+ & \ddots & \ddots & \ddots & \\
+ & & \mu & -(\lambda+\mu) & \lambda\\
+ & & & \mu & -\mu
+\end{pmatrix},
+\]
+c'est-à-dire $q_{n,n+1}=\lambda$ pour $n<C$ et $q_{n,n-1}=\mu$ pour $n>0$. C'est la file M/M/1/C~: les vélos jouent le rôle des clients, les retraits celui du service \cite[§3.5]{STGH18}, \cite{Bre99}. On note $\rho=\lambda/\mu$~; $Q$ est irréductible dès que $\lambda,\mu>0$.
+
+\subsection{Loi stationnaire}
+
+\begin{proposition}\label{prop:pi}
+Pour $\lambda,\mu>0$, la loi stationnaire est
+\[
+\pi_n=\frac{\rho^n(1-\rho)}{1-\rho^{C+1}}\ \ (\rho\neq1),\qquad\pi_n=\frac{1}{C+1}\ \ (\rho=1).
+\]
+\end{proposition}
+
+\begin{proof}
+Cette loi vérifie l'équilibre détaillé $\pi_n\lambda=\pi_{n+1}\mu$ pour $0\leq n<C$. Notons $\phi_n=\pi_n\lambda-\pi_{n+1}\mu$ le flux net de $n$ vers $n+1$, avec $\phi_{-1}=\phi_C=0$. Alors $(\pi Q)_n=\phi_{n-1}-\phi_n=0$ pour tout $n$. On conclut par le théorème~\ref{thm:stationnaire}.
+\end{proof}
+
+\begin{corollaire}[indicateurs de service]\label{cor:indicateurs}
+Sous $\pi$~:
+\begin{enumerate}[label=(\roman*)]
+\item la station est vide une fraction $\pi_0$ du temps et pleine une fraction $\pi_C$~;
+\item les fractions de retraits et de dépôts refusés valent $\pi_0$ et $\pi_C$~;
+\item $\EE_\pi[X]=\dfrac{\rho}{1-\rho}-\dfrac{(C+1)\rho^{C+1}}{1-\rho^{C+1}}$ si $\rho\neq1$, et $C/2$ si $\rho=1$~;
+\item quand $C\to+\infty$, $\pi_0\to(1-\rho)^+$ et $\pi_C\to(1-1/\rho)^+$.
+\end{enumerate}
+\end{corollaire}
+
+\begin{proof}
+(i) est le théorème~\ref{thm:ergodique}. (ii) Les dépôts forment un processus de Poisson indépendant du passé de $X$~: un dépôt voit donc la station dans l'état moyen en temps, soit $\pi$ sur le long terme (propriété PASTA \cite{Wol82}). (iii) On écrit $\sum_{n=0}^Cn\rho^n=\rho\frac{\dd}{\dd\rho}\frac{1-\rho^{C+1}}{1-\rho}$ et on simplifie. (iv) Si $\rho<1$, $\rho^{C+1}\to0$~; si $\rho>1$, $\pi_C=\rho^C(\rho-1)/(\rho^{C+1}-1)\to1-1/\rho$.
+\end{proof}
+
+La loi $\pi$ est géométrique de raison $\rho$~: elle se concentre près de $0$ si $\rho<1$ et près de $C$ si $\rho>1$. D'après (iv), un déséquilibre $\rho>1$ fait refuser une fraction $1-1/\rho$ des dépôts quelle que soit la capacité~: agrandir la station ne corrige pas un déséquilibre des flux.
+
+\subsection{Spectre et vitesse de convergence}\label{sec:spectre}
+
+Soit $D=\mathrm{diag}(\pi_0,\dots,\pi_C)$. L'équilibre détaillé s'écrit $DQ={}^t(DQ)$~: la chaîne est réversible. La matrice $S=D^{1/2}QD^{-1/2}$ est symétrique et tridiagonale, de diagonale $(-\lambda,-(\lambda+\mu),\dots,-(\lambda+\mu),-\mu)$ et de coefficients hors diagonale égaux à $\sqrt{\lambda\mu}$. Le spectre de $Q$ est donc réel~; il est même explicite.
+
+\begin{theoreme}[spectre]\label{thm:spectre}
+Soient $\lambda,\mu>0$ et $\theta_k=k\pi/(C+1)$. Les valeurs propres de $Q$ sont $0$ et
+\[
+s_k=-(\lambda+\mu)+2\sqrt{\lambda\mu}\cos\theta_k,\qquad1\leq k\leq C,
+\]
+de vecteurs propres à droite
+\[
+f_k(n)=\rho^{-n/2}\big(\sin((n+1)\theta_k)-\rho^{-1/2}\sin(n\theta_k)\big).
+\]
+Le trou spectral vaut
+\[
+\gamma=-s_1=\big(\sqrt\lambda-\sqrt\mu\big)^2+4\sqrt{\lambda\mu}\,\sin^2\frac{\pi}{2(C+1)}.
+\]
+\end{theoreme}
+
+\begin{proof}
+Écrivons $f(n)=\rho^{-n/2}g(n)$. Pour $1\leq n\leq C-1$,
+\[
+(Qf)(n)=\rho^{-n/2}\Big(\sqrt{\lambda\mu}\,\big(g(n+1)+g(n-1)\big)-(\lambda+\mu)\,g(n)\Big).
+\]
+Toute combinaison $g$ de $\sin(n\theta)$ et $\cos(n\theta)$ vérifie $g(n+1)+g(n-1)=2\cos\theta\,g(n)$, donc $(Qf)(n)=s\,f(n)$ avec $s=-(\lambda+\mu)+2\sqrt{\lambda\mu}\cos\theta$. En prolongeant $g$ par la même formule en $n=-1$ et $n=C+1$, les équations aux bords $n=0$ et $n=C$ se réduisent à
+\[
+g(-1)=\rho^{-1/2}g(0),\qquad g(C+1)=\rho^{1/2}g(C).
+\]
+Pour $g(n)=\sin((n+1)\theta)-\rho^{-1/2}\sin(n\theta)$, la première égalité vaut pour tout $\theta$. Pour $\theta=\theta_k$, $\sin((C+1)\theta_k)=0$, d'où $g(C)=(-1)^k\rho^{-1/2}\sin\theta_k$ et $g(C+1)=(-1)^k\sin\theta_k$~: la seconde est vérifiée. Les $s_k$ sont distincts et strictement négatifs, car $2\sqrt{\lambda\mu}\cos\theta_k<2\sqrt{\lambda\mu}\leq\lambda+\mu$. Avec la valeur propre $0$, de vecteur $\un$, on obtient $C+1$ valeurs propres distinctes, donc tout le spectre. L'expression de $\gamma$ vient de $1-\cos x=2\sin^2(x/2)$.
+\end{proof}
+
+\begin{theoreme}[vitesse de convergence]\label{thm:vitesse}
+Pour tout état initial $i$ et tout $t\geq0$,
+\[
+\frac{|f_1(i)|}{2\|f_1\|_\infty}\,e^{-\gamma t}\leq\|\delta_ie^{tQ}-\pi\|_\VT\leq\frac12\sqrt{\frac{1-\pi_i}{\pi_i}}\,e^{-\gamma t}.
+\]
+\end{theoreme}
+
+\begin{proof}
+\emph{Majoration.} Soit $\langle u,v\rangle_\pi=\sum_n\pi_nu(n)v(n)$. Par réversibilité, $Q$ est autoadjoint pour ce produit scalaire~; il admet une base orthonormée de vecteurs propres $e_0=\un,e_1,\dots,e_C$, de valeurs propres $0,s_1,\dots,s_C$, avec $s_k\leq-\gamma$ pour $k\geq1$. Posons $u_t(j)=P(t)_{ij}/\pi_j$. La réversibilité de $P(t)$ donne $u_t=e^{tQ}u_0$, d'où
+\begin{align*}
+\|u_t-\un\|_\pi^2&=\sum_{k=1}^Ce^{2s_kt}\langle u_0,e_k\rangle_\pi^2\leq e^{-2\gamma t}\|u_0-\un\|_\pi^2\\
+&=e^{-2\gamma t}\,\frac{1-\pi_i}{\pi_i}.
+\end{align*}
+Par Cauchy--Schwarz, $2\|\delta_iP(t)-\pi\|_\VT=\sum_j\pi_j|u_t(j)-1|\leq\|u_t-\un\|_\pi$.
+
+\emph{Minoration.} $\pi f_1=s_1^{-1}\pi Qf_1=0$. Comme $P(t)f_1=e^{-\gamma t}f_1$,
+\begin{align*}
+e^{-\gamma t}|f_1(i)|&=\Big|\sum_j\big(P(t)_{ij}-\pi_j\big)f_1(j)\Big|\\
+&\leq2\|f_1\|_\infty\|\delta_iP(t)-\pi\|_\VT.\qedhere
+\end{align*}
+\end{proof}
+
+Ces bornes sont l'analogue en temps continu de celles de \cite[chap.~12]{LP17}.
+
+\begin{remarque}[relaxation et mélange]\label{rem:melange}
+Le temps de relaxation $\trel=1/\gamma$ ne décrit pas seul l'approche de l'équilibre. Si $\rho=1$, $\gamma=4\lambda\sin^2\frac{\pi}{2(C+1)}\approx\pi^2\lambda/(C+1)^2$~: l'échelle est diffusive, en $C^2/\lambda$. Pour $C=45$ et $\lambda=\mu=4\hr$, $\trel=@@relax_rho1@@$~h. Si $\rho$ s'éloigne de $1$, $\gamma\geq(\sqrt\lambda-\sqrt\mu)^2$ devient grand, mais le préfacteur $\sqrt{(1-\pi_i)/\pi_i}$ est de l'ordre de $\rho^{\pm C/2}$ depuis l'état le moins probable~: la chaîne doit d'abord traverser la station, ce qui prend un temps de l'ordre de $C/|\lambda-\mu|$. On utilise donc aussi le temps de mélange
+\[
+\tmel=\inf\Big\{t\geq0:\max_{i\in E}\|\delta_ie^{tQ}-\pi\|_\VT\leq\tfrac14\Big\},
+\]
+calculé numériquement par dichotomie.
+\end{remarque}
+
+\subsection{Temps d'atteinte}\label{sec:atteinte}
+
+Pour $A\subset E$, notons $T_A=\inf\{t\geq0:X_t\in A\}$ et $m_A(n)=\EE_n[T_A]$. Avec les notations de la construction par sauts, $T_A=J_N$ où $N=\inf\{n\geq0:Y_n\in A\}$~; c'est une variable aléatoire à valeurs dans $[0,+\infty]$.
+
+\begin{proposition}\label{prop:atteinte}
+Si $Q$ est irréductible et $A\neq\emptyset$, $m_A$ est l'unique solution du système $m=0$ sur $A$, $(Qm)(n)=-1$ pour $n\notin A$.
+\end{proposition}
+
+\begin{proof}
+\emph{Finitude.} D'après le lemme~\ref{lem:positif}, il existe $h>0$ et $\eta>0$ tels que $\PP_n(X_h\in A)\geq\eta$ pour tout $n$~; par la propriété de Markov aux instants $kh$, $\PP_n(T_A>kh)\leq(1-\eta)^k$, donc $m_A(n)<\infty$.
+\emph{Équation.} Depuis $n\notin A$, la chaîne reste en $n$ un temps de moyenne $1/q_n$, puis saute en $j$ avec probabilité $q_{nj}/q_n$. Par la propriété de Markov au premier saut, $m_A(n)=1/q_n+\sum_{j\neq n}(q_{nj}/q_n)\,m_A(j)$, ce qui équivaut à $(Qm_A)(n)=-1$.
+\emph{Unicité.} Soit $v$ nulle sur $A$ et telle que $Qv=0$ hors de $A$. Soit $n$ un point où $|v|$ est maximal, avec par exemple $v(n)\geq0$. Si $n\notin A$, $v(n)$ est une moyenne des $v(j)$ tels que $q_{nj}>0$, donc $v(j)=v(n)$ pour ces $j$. De proche en proche le long d'un chemin vers $A$, on obtient $v(n)=0$, donc $v=0$.
+\end{proof}
+
+\begin{corollaire}\label{cor:ruine}
+Pour la station, si $\rho\neq1$,
+\begin{gather*}
+\PP_n(T_C<T_0)=\frac{1-\rho^{-n}}{1-\rho^{-C}},\\
+\EE_n[T_0]=\frac{1}{\mu(1-\rho)}\Big(n-\rho^{C+1-n}\,\frac{1-\rho^n}{1-\rho}\Big).
+\end{gather*}
+Si $\rho=1$, $\PP_n(T_C<T_0)=n/C$ et $\EE_n[T_0]=n(2C-n+1)/(2\mu)$.
+\end{corollaire}
+
+\begin{proof}
+La fonction $h(n)=\PP_n(T_C<T_0)$ vérifie $h(0)=0$, $h(C)=1$ et, par le même argument de premier saut, $(Qh)(n)=0$ pour $0<n<C$, soit $\lambda\big(h(n+1)-h(n)\big)=\mu\big(h(n)-h(n-1)\big)$~: les accroissements de $h$ forment une suite géométrique de raison $1/\rho$. Pour le temps de vidage, $\tau_n=\EE_n[T_{n-1}]$ vérifie $\tau_C=1/\mu$ et, en conditionnant par le premier saut, $\tau_n=1/\mu+\rho\,\tau_{n+1}$. Donc $\tau_n=\frac1\mu\sum_{j=0}^{C-n}\rho^j$ et $\EE_n[T_0]=\sum_{m=1}^n\tau_m$.
+\end{proof}
+
+Ces quantités ont une lecture opérationnelle. Avec les taux de la pointe du matin à Gare de Lyon ($\hat\lambda=@@lam_pointe@@\hr$, $\hat\mu=@@mu_pointe@@\hr$, section~\ref{sec:saison}), une station à 10 vélos sature en moyenne en @@sat10@@~h. Avec ceux du créneau 8~h--10~h, presque équilibré ($\hat\rho=@@rho_equil@@$), une station à 30 vélos atteint $0$ ou $C$ en @@sortie30@@~h en moyenne (proposition~\ref{prop:atteinte}, résolue numériquement), et sature avant de se vider avec probabilité @@psat30@@. Le bruit poissonnien seul ne fait pas basculer une station en quelques heures~: ce sont les déséquilibres $\lambda\neq\mu$ qui produisent les cycles de remplissage.
+
+\section{Estimation statistique}\label{sec:estimation}
+
+\subsection{Vraisemblance}
+
+\begin{proposition}\label{prop:emv}
+Considérons une trajectoire observée continûment sur $[0,T]$, avec $\Nu$ dépôts et $\Nd$ retraits, et notons $\Tu=\int_0^T\un_{\{X_t<C\}}\dd t$ et $\Td=\int_0^T\un_{\{X_t>0\}}\dd t$ les temps d'exposition aux dépôts et aux retraits. La vraisemblance vaut
+\[
+L(\lambda,\mu)=\lambda^{\Nu}\mu^{\Nd}\exp\big(-\lambda\Tu-\mu\Td\big),
+\]
+et les estimateurs du maximum de vraisemblance sont $\hat\lambda=\Nu/\Tu$ et $\hat\mu=\Nd/\Td$.
+\end{proposition}
+
+\begin{proof}
+Sachant $X_0$, la loi du nombre de sauts sur $[0,T]$, des états visités et des instants de saut a une densité par rapport au produit de la mesure de comptage et de la mesure de Lebesgue. C'est le produit, sur les séjours successifs, de la densité $q_ne^{-q_ns}$ de la durée $s$ passée en $n$ et de la probabilité $q_{nn'}/q_n$ du saut effectué~; le dernier séjour, censuré en $T$, contribue pour $e^{-q_ns}$, probabilité que la durée dépasse $s$. Il reste un facteur $\lambda$ par dépôt, un facteur $\mu$ par retrait et $\exp(-\sum q_ns)$, où $\sum q_ns=\lambda\Tu+\mu\Td$ car $q_n=\lambda\un_{n<C}+\mu\un_{n>0}$. Si $\Nu>0$, la log-vraisemblance est strictement concave en $\lambda$ et maximale en $\hat\lambda$~; de même pour $\mu$.
+\end{proof}
+
+La vraisemblance se factorise, donc $\hat\lambda$ et $\hat\mu$ sont asymptotiquement indépendants \cite{Alb62,Bil61}. Le processus $\Nu_t-\lambda\Tu_t$ est une martingale de crochet $\lambda\Tu_t$~; le théorème central limite pour les martingales donne $\mathrm{Var}(\ln\hat\lambda)\approx1/(\lambda\Tu)\approx1/\Nu$. On en tire les intervalles de confiance à 95~\%
+\[
+\hat\lambda\,e^{\pm1{,}96/\sqrt{\Nu}},\qquad\hat\rho\,\exp\Big(\pm1{,}96\sqrt{1/\Nu+1/\Nd}\Big),
+\]
+qui restent dans $]0,+\infty[$. Ce sont les estimateurs utilisés pour les générateurs de migration de notations~: nombre de transitions divisé par le temps passé dans l'état de départ \cite{LS02}.
+
+\subsection{Test du rapport de vraisemblance}\label{sec:rv}
+
+Pour comparer $K$ périodes (créneaux horaires ou jours), on teste $H_0:\lambda_1=\dots=\lambda_K$ contre l'alternative non contrainte. Avec $\hat\lambda_k=N_k/T_k$ et $\hat\lambda_0=\sum_kN_k/\sum_kT_k$, la statistique
+\[
+W=2\sum_{k=1}^KN_k\ln\frac{\hat\lambda_k}{\hat\lambda_0}
+\]
+suit asymptotiquement la loi $\chi^2(K-1)$ sous $H_0$ (théorème de Wilks). En effet, $\ln L=\sum_k(N_k\ln\lambda_k-\lambda_kT_k)$ et les termes en $\lambda T$ s'annulent dans la différence des maxima, car $\hat\lambda_0\sum_kT_k=\sum_kN_k=\sum_k\hat\lambda_kT_k$. Le test est le même pour $\mu$.
+
+\subsection{Observation à la minute}\label{sec:minute}
+
+Les données sont des relevés à la minute et non des trajectoires continues. On compte comme dépôts la partie positive de chaque variation $\Delta$ entre deux relevés, comme retraits sa partie négative, et on mesure les expositions en minutes où un dépôt (au moins une borne libre) ou un retrait (au moins un vélo) est possible. Trois remarques s'imposent.
+
+\paragraph{Compensation} Un dépôt et un retrait dans la même minute s'annulent. Si $A$ et $B$ sont les nombres de dépôts et de retraits d'une minute, de lois de Poisson de paramètres $a=\lambda/60$ et $b=\mu/60$, les taux étant exprimés en $\mathrm{h}^{-1}$, on observe $(A-B)^+$ et $(A-B)^-$, d'espérances $a-\EE[\min(A,B)]$ et $b-\EE[\min(A,B)]$, avec $\EE[\min(A,B)]\approx ab$. Le biais relatif de $\hat\lambda$ vaut environ $-\mu/60$, soit $-7$~\% pour $\mu=4\hr$, mais la dérive $\lambda-\mu$ est estimée sans biais. Sur la semaine à Gare de Lyon, les taux estimés prévoient @@paires@@ paires masquées~; compter séparément vélos mécaniques et électriques en révèle @@paires_vues@@, ce qui est une borne inférieure.
+
+\paragraph{Censure} Quand la station est pleine, les dépôts refusés ne sont pas observés. L'exposition $\Tu$ exclut ces périodes et $\hat\lambda$ reste convergent. Des bornes pouvant être hors service, on teste \og au moins une borne libre\fg{} plutôt que $X<C$.
+
+\paragraph{Arrivées groupées} Une variation $|\Delta|\geq2$ peut provenir d'usagers distincts ou d'un groupe. La section~\ref{sec:poisson} compare leur fréquence à la prédiction poissonnienne.
+
+\section{Simulation et calcul exact}\label{sec:simulation}
+
+\subsection{Algorithmes}
+
+\paragraph{Algorithme de Gillespie} Le lemme~\ref{lem:horloges} fournit un algorithme exact \cite{Gil77}~: dans l'état $n$, on tire un délai de loi $\mathcal{E}(q_n)$, puis un dépôt avec probabilité $\lambda\un_{n<C}/q_n$ et un retrait sinon (fonction \texttt{gillespie}, annexe~\ref{sec:code}).
+
+\paragraph{Taux constants par créneaux} Par absence de mémoire, on simule chaque créneau comme une chaîne homogène issue de l'état atteint à la fin du précédent. L'horloge qui dépasse la fin du créneau est abandonnée (fonction \texttt{gillespie\_creneaux}). L'algorithme est exact.
+
+\paragraph{Calcul exact} La loi de $X_t$ s'obtient sans simulation~: sur le créneau $k$, $p(t+1\,\mathrm{min})=p(t)\,e^{Q_k/60}$ (proposition~\ref{prop:semigroupe}), soit une exponentielle de matrice $(C+1)\times(C+1)$ par créneau (fonction \texttt{lois\_par\_minute}). On en déduit l'espérance et la bande de prédiction à 90~\%, formée des quantiles à 5~\% et 95~\%. La simulation reste utile pour les fonctionnelles de trajectoire, comme le temps passé à saturation dans la journée. Sur @@nsim@@ trajectoires d'une journée, l'écart maximal entre la moyenne empirique et l'espérance exacte est de @@mc_ecart@@~vélo, pour une erreur type d'au plus @@mc_et@@~vélo.
+
+\subsection{Deux biais numériques de l'étude préliminaire}\label{sec:biais}
+
+Le TIPE comptait seulement les variations unitaires ($|\Delta|=1$), ce qui écartait @@perte_dep@@~\% des dépôts et @@perte_pri@@~\% des retraits. Il simulait de plus la chaîne inhomogène en gelant les taux au dernier saut~: le délai jusqu'au saut suivant était tiré avec les taux du créneau courant, même s'il débordait sur les suivants. La nuit, les taux sont presque nuls~; un délai tiré vers 2~h pouvait dépasser la pointe de 7~h, alors manquée. Un plancher de $0{,}3\hr$ évitait qu'une simulation se bloque quand les deux taux étaient nuls.
+
+Le tableau~\ref{tab:variantes} sépare les deux effets sur la journée du mardi 2 juin, avec des taux estimés sur cette même journée. Chacun des deux raccourcis abaisse la prévision de midi de @@baisse_min@@ à @@baisse_max@@ vélos~; ensemble, de @@biais12@@. C'est l'\og écart de niveau\fg{} que le TIPE attribuait à la régulation et au couplage entre stations. Corrigé, le modèle à créneaux suit la trajectoire du mardi à @@v_exact_mae@@~vélo près en moyenne. Ce résultat est obtenu en échantillon~; la section~\ref{sec:prevision} traite la prévision hors échantillon.
+
+\begin{table}[t]
+\centering\small
+\caption{Effet de l'estimateur et du schéma de simulation, mardi 2 juin, taux estimés sur la journée. EAM~: écart absolu moyen entre l'espérance simulée et la trajectoire sur 24~h. Valeur observée à midi~: @@reel12@@ vélos.}\label{tab:variantes}
+\begin{tabular}{@{}llcc@{}}
+\toprule
+Estimateur & Simulation & EAM & $\hat X_{12\,\mathrm{h}}$\\
+\midrule
+toutes variations & exacte & @@v_exact_mae@@ & @@v_exact_12@@\\
+toutes variations & taux gelés & @@v_fige_mae@@ & @@v_fige_12@@\\
+variations unitaires & exacte & @@v_unit_mae@@ & @@v_unit_12@@\\
+variations unitaires & taux gelés & @@v_uf_mae@@ & @@v_uf_12@@\\
+\bottomrule
+\end{tabular}
+\end{table}
