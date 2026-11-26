@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Modèle markovien d'une station Vélib' : régime stationnaire, calibration et limites"
+authors:
+  - family-names: Nguyen
+    given-names: Matthias
+date-released: 2026-11-26
+license: MIT
+repository-code: "https://github.com/matthiasngn/velib-markov"
